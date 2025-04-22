@@ -1,0 +1,1 @@
+--Archivo para crear tablas relacionadas con tarjetas

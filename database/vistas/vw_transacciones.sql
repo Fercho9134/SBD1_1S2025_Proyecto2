@@ -1,0 +1,3 @@
+--Vistas relacionadas con transacciones
+--vw_card_transactions
+--vw_transactions

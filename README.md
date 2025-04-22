@@ -1,1 +1,1 @@
-# SBD1_1S2025_Proyecto2
+# Documentación unida (al final)

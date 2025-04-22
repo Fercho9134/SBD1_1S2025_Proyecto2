@@ -1,0 +1,2 @@
+--Funciones relacionadas con clientes
+--fn_current_money_by_client

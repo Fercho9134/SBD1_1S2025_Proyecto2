@@ -1,0 +1,2 @@
+--Procedimientos relacionados con prestamos
+--sp_get_loan

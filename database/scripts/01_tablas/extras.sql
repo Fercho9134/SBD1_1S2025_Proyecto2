@@ -1,0 +1,2 @@
+--Archivo para crear tablas extras mencionadas en el enunciado
+--Premios, notificaciones

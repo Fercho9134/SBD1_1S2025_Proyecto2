@@ -1,0 +1,3 @@
+--Vistas relacionadas con seguros
+--vw_active_insurances
+--vw_inactive_insurances

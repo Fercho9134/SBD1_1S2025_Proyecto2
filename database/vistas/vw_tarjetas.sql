@@ -1,0 +1,3 @@
+--Vistas relacionadas con tarjetas
+-- --vw_active_credit_cards
+-- --vw_active_debit_cards

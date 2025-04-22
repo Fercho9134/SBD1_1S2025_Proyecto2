@@ -1,0 +1,3 @@
+--Vistas relacionadas con prestamos
+--vw_active_loans
+--vw_inactive_loans

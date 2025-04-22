@@ -1,0 +1,5 @@
+--Archivo para crear procedimientos extras, premios y notificaciones
+--sp_notifications_by_client
+--sp_register_notification (Extra no mencionado en el enunciado, crear notificacion)
+--sp_register_award (Extra no mencionado en el enunciado, crear premio)
+--sp_awards_by_client

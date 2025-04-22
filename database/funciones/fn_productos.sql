@@ -1,0 +1,6 @@
+--Funciones relacionadas con productos/servicios
+--fn_amount_services_by_client
+--fn_avg_services
+--fn_total_amount_services_by_client
+--fn_max_amount_products
+--fn_max_value_products
