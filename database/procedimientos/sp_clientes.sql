@@ -1,10 +1,10 @@
 CREATE OR REPLACE PROCEDURE sp_register_new_client(
-    p_nombre IN VARCHAR2,
-    p_apellido IN VARCHAR2,
-    p_numero_telefono IN VARCHAR2,
-    p_email IN VARCHAR2,
-    p_usuario IN VARCHAR2,
-    p_contrasena IN VARCHAR2,
+    p_nombre IN VARCHAR2(50),
+    p_apellido IN VARCHAR2(50),
+    p_numero_telefono IN VARCHAR2(12),
+    p_email IN VARCHAR2(50),
+    p_usuario IN VARCHAR2(50),
+    p_contrasena IN VARCHAR2(100),
     p_fecha_nacimiento IN DATE,
     p_tipo_cliente IN INTEGER
 )
@@ -116,8 +116,8 @@ END sp_register_new_client;
 -- /
 
 CREATE OR REPLACE PROCEDURE sp_register_new_type_client(
-    p_nombre IN VARCHAR2,
-    p_descripcion IN VARCHAR2
+    p_nombre IN VARCHAR2(50),
+    p_descripcion IN VARCHAR2(100)
 )
 IS
     v_regex_letras VARCHAR2(100) := '^[A-Za-zÁÉÍÓÚáéíóúÑñÜü\s.,;:()''-]+$';
@@ -158,9 +158,9 @@ END sp_register_new_type_client;
 
 -- Ejemplo de llamada
 -- BEGIN
---     agregar_tipo_cliente(
---         p_nombre => 'Cliente Premium',
---         p_descripcion => 'Clientes con beneficios especiales (membresía anual).'
+--     sp_register_new_type_client(
+--         p_nombre => 'Individual Nacional',
+--         p_descripcion => 'Este tipo de cliente es una persona individual de nacionalidad guatemalteca.'
 --     );
 -- END;
 -- /
