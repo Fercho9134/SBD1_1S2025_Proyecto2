@@ -43,21 +43,3 @@ CREATE TABLE CLIENTE (
         FOREIGN KEY (tipo_cliente) 
         REFERENCES TIPO_CLIENTE(id_tipo_cliente)
 );
-
--- Trigger para actualizar updated_at de TIPO_CLIENTE
-CREATE OR REPLACE TRIGGER trg_tipo_cliente_updated
-BEFORE UPDATE ON TIPO_CLIENTE
-FOR EACH ROW
-BEGIN
-    :NEW.updated_at := SYSTIMESTAMP;
-END;
-/
-
--- Trigger para actualizar updated_at de CLIENTE
-CREATE OR REPLACE TRIGGER trg_cliente_updated
-BEFORE UPDATE ON CLIENTE
-FOR EACH ROW
-BEGIN
-    :NEW.updated_at := SYSTIMESTAMP;
-END;
-/

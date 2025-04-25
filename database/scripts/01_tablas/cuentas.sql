@@ -49,30 +49,3 @@ CREATE TABLE CUENTA (
         FOREIGN KEY (tipo_cuenta)
         REFERENCES TIPO_CUENTA(id_tipo_cuenta)
 );
-
--- Trigger para actualizar updated_at de TIPO_CUENTA
-CREATE OR REPLACE TRIGGER trg_tipo_cuenta_updated
-BEFORE UPDATE ON TIPO_CUENTA
-FOR EACH ROW
-BEGIN
-    :NEW.updated_at := SYSTIMESTAMP;
-END;
-/
-
--- Trigger para actualizar updated_at de CUENTA
-CREATE OR REPLACE TRIGGER trg_cuenta_updated
-BEFORE UPDATE ON CUENTA
-FOR EACH ROW
-BEGIN
-    :NEW.updated_at := SYSTIMESTAMP;
-END;
-/
-
--- Trigger para evitar modificacion de monto_apertura
-CREATE OR REPLACE TRIGGER trg_proteger_monto_apertura
-BEFORE UPDATE OF monto_apertura ON CUENTA
-FOR EACH ROW
-BEGIN
-    RAISE_APPLICATION_ERROR(-20003, 'El monto de apertura no puede ser modificado');
-END;
-/
