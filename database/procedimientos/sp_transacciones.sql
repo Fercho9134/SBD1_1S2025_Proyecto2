@@ -1,3 +1,0 @@
---Procedimientos relacionados con transacciones
---sp_transaction
---sp_transactions_by_client
