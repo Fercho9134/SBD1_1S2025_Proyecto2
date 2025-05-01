@@ -1,10 +1,12 @@
+GRANT EXECUTE ON DBMS_CRYPTO TO nombre_usuario;
+
 CREATE OR REPLACE PROCEDURE sp_register_new_client(
-    p_nombre IN VARCHAR2(50),
-    p_apellido IN VARCHAR2(50),
-    p_numero_telefono IN VARCHAR2(12),
-    p_email IN VARCHAR2(50),
-    p_usuario IN VARCHAR2(50),
-    p_contrasena IN VARCHAR2(100),
+    p_nombre IN VARCHAR2,
+    p_apellido IN VARCHAR2,
+    p_numero_telefono IN VARCHAR2,
+    p_email IN VARCHAR2,
+    p_usuario IN VARCHAR2,
+    p_contrasena IN VARCHAR2,
     p_fecha_nacimiento IN DATE,
     p_tipo_cliente IN INTEGER
 )
@@ -116,11 +118,11 @@ END sp_register_new_client;
 -- /
 
 CREATE OR REPLACE PROCEDURE sp_register_new_type_client(
-    p_nombre IN VARCHAR2(50),
-    p_descripcion IN VARCHAR2(100)
+    p_nombre IN VARCHAR2,
+    p_descripcion IN VARCHAR2
 )
 IS
-    v_regex_letras VARCHAR2(100) := '^[A-Za-zÁÉÍÓÚáéíóúÑñÜü\s.,;:()''-]+$';
+    v_regex_letras VARCHAR2(100) := '^[A-Za-zÁÉÍÓÚáéíóúÑñÜü ]+$';
     v_count NUMBER;
 BEGIN
     -- Validar descripción (letras y caracteres especiales comunes)
