@@ -122,8 +122,7 @@ CREATE TABLE INTERES_CUENTA (
         NOT NULL,
     CONSTRAINT fk_interes_cuenta
         FOREIGN KEY (id_cuenta)
-        REFERENCES CUENTA(id_cuenta),
-        updated_at TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL
+        REFERENCES CUENTA(id_cuenta)
 );
 
 CREATE TABLE NOTIFICACION (
@@ -1761,6 +1760,99 @@ BEGIN
 END sp_consultar_cuotas_pendientes;
 /
 
+CREATE OR REPLACE PROCEDURE p_actualizar_tarjetas_por_cuenta(
+    p_id_cuenta IN CUENTA.id_cuenta%TYPE
+) IS
+    v_saldo_cuenta CUENTA.saldo_cuenta%TYPE;
+BEGIN
+    -- Obtener saldo actual de la cuenta con bloqueo
+    SELECT saldo_cuenta INTO v_saldo_cuenta
+    FROM CUENTA
+    WHERE id_cuenta = p_id_cuenta
+    FOR UPDATE;
+    
+    -- Validar saldo no negativo
+    IF v_saldo_cuenta < 0 THEN
+        RAISE_APPLICATION_ERROR(-20010, 'El saldo de la cuenta no puede ser negativo');
+    END IF;
+    
+    -- Actualizar todas las tarjetas de débito asociadas
+    UPDATE TARJETA
+    SET saldo_tarjeta = v_saldo_cuenta,
+        monto_limite = v_saldo_cuenta,
+        updated_at = SYSTIMESTAMP
+    WHERE id_cuenta = p_id_cuenta
+    AND id_tipo = 'D';
+    
+    COMMIT;
+    
+    DBMS_OUTPUT.PUT_LINE('Actualizadas ' || SQL%ROWCOUNT || ' tarjetas de débito');
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        RAISE_APPLICATION_ERROR(-20011, 'La cuenta especificada no existe');
+    WHEN OTHERS THEN
+        ROLLBACK;
+        RAISE_APPLICATION_ERROR(-20012, 'Error actualizando tarjetas: ' || SQLERRM);
+END p_actualizar_tarjetas_por_cuenta;
+/
+
+CREATE OR REPLACE PROCEDURE p_actualizar_cuenta_por_tarjeta(
+    p_id_tarjeta IN TARJETA.id_tarjeta%TYPE,
+    p_monto_consumo IN NUMBER
+) IS
+    v_id_cuenta TARJETA.id_cuenta%TYPE;
+    v_tipo_tarjeta TARJETA.id_tipo%TYPE;
+    v_saldo_cuenta CUENTA.saldo_cuenta%TYPE;
+BEGIN
+    -- Obtener información de la tarjeta
+    BEGIN
+        SELECT id_cuenta, id_tipo INTO v_id_cuenta, v_tipo_tarjeta
+        FROM TARJETA
+        WHERE id_tarjeta = p_id_tarjeta;
+    EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+            RAISE_APPLICATION_ERROR(-20022, 'La tarjeta especificada no existe');
+    END;
+    
+    -- Solo procesar si es tarjeta de débito con cuenta asociada
+    IF v_tipo_tarjeta = 'D' AND v_id_cuenta IS NOT NULL THEN
+        -- Actualizar saldo de la cuenta con bloqueo
+        BEGIN
+            UPDATE CUENTA
+            SET saldo_cuenta = saldo_cuenta - p_monto_consumo,
+                updated_at = SYSTIMESTAMP
+            WHERE id_cuenta = v_id_cuenta
+            RETURNING saldo_cuenta INTO v_saldo_cuenta;
+            
+            -- Validar que no quede saldo negativo
+            IF v_saldo_cuenta < 0 THEN
+                ROLLBACK;
+                RAISE_APPLICATION_ERROR(-20021, 'Saldo insuficiente en la cuenta');
+            END IF;
+            
+            -- Actualizar la tarjeta con el nuevo saldo
+            UPDATE TARJETA
+            SET saldo_tarjeta = v_saldo_cuenta,
+                monto_limite = v_saldo_cuenta,
+                updated_at = SYSTIMESTAMP
+            WHERE id_tarjeta = p_id_tarjeta;
+            
+            COMMIT;
+            
+            DBMS_OUTPUT.PUT_LINE('Cuenta y tarjeta actualizadas. Nuevo saldo: ' || v_saldo_cuenta);
+        EXCEPTION
+            WHEN OTHERS THEN
+                ROLLBACK;
+                RAISE_APPLICATION_ERROR(-20023, 'Error actualizando cuenta: ' || SQLERRM);
+        END;
+    ELSE
+        -- Para tarjetas de crédito o sin cuenta asociada, simplemente salir sin error
+        DBMS_OUTPUT.PUT_LINE('Operación no requerida para este tipo de tarjeta');
+        RETURN;
+    END IF;
+END p_actualizar_cuenta_por_tarjeta;
+/
+
 CREATE OR REPLACE PROCEDURE sp_calcular_intereses_tarjeta(
     p_id_tarjeta IN INTEGER
 ) IS
@@ -3249,100 +3341,6 @@ EXCEPTION
         RAISE_APPLICATION_ERROR(-20003, 'Error en trg_tarjeta_debito: ' || SQLERRM);
 END;
 /
-
-CREATE OR REPLACE PROCEDURE p_actualizar_tarjetas_por_cuenta(
-    p_id_cuenta IN CUENTA.id_cuenta%TYPE
-) IS
-    v_saldo_cuenta CUENTA.saldo_cuenta%TYPE;
-BEGIN
-    -- Obtener saldo actual de la cuenta con bloqueo
-    SELECT saldo_cuenta INTO v_saldo_cuenta
-    FROM CUENTA
-    WHERE id_cuenta = p_id_cuenta
-    FOR UPDATE;
-    
-    -- Validar saldo no negativo
-    IF v_saldo_cuenta < 0 THEN
-        RAISE_APPLICATION_ERROR(-20010, 'El saldo de la cuenta no puede ser negativo');
-    END IF;
-    
-    -- Actualizar todas las tarjetas de débito asociadas
-    UPDATE TARJETA
-    SET saldo_tarjeta = v_saldo_cuenta,
-        monto_limite = v_saldo_cuenta,
-        updated_at = SYSTIMESTAMP
-    WHERE id_cuenta = p_id_cuenta
-    AND id_tipo = 'D';
-    
-    COMMIT;
-    
-    DBMS_OUTPUT.PUT_LINE('Actualizadas ' || SQL%ROWCOUNT || ' tarjetas de débito');
-EXCEPTION
-    WHEN NO_DATA_FOUND THEN
-        RAISE_APPLICATION_ERROR(-20011, 'La cuenta especificada no existe');
-    WHEN OTHERS THEN
-        ROLLBACK;
-        RAISE_APPLICATION_ERROR(-20012, 'Error actualizando tarjetas: ' || SQLERRM);
-END p_actualizar_tarjetas_por_cuenta;
-/
-
-CREATE OR REPLACE PROCEDURE p_actualizar_cuenta_por_tarjeta(
-    p_id_tarjeta IN TARJETA.id_tarjeta%TYPE,
-    p_monto_consumo IN NUMBER
-) IS
-    v_id_cuenta TARJETA.id_cuenta%TYPE;
-    v_tipo_tarjeta TARJETA.id_tipo%TYPE;
-    v_saldo_cuenta CUENTA.saldo_cuenta%TYPE;
-BEGIN
-    -- Obtener información de la tarjeta
-    BEGIN
-        SELECT id_cuenta, id_tipo INTO v_id_cuenta, v_tipo_tarjeta
-        FROM TARJETA
-        WHERE id_tarjeta = p_id_tarjeta;
-    EXCEPTION
-        WHEN NO_DATA_FOUND THEN
-            RAISE_APPLICATION_ERROR(-20022, 'La tarjeta especificada no existe');
-    END;
-    
-    -- Solo procesar si es tarjeta de débito con cuenta asociada
-    IF v_tipo_tarjeta = 'D' AND v_id_cuenta IS NOT NULL THEN
-        -- Actualizar saldo de la cuenta con bloqueo
-        BEGIN
-            UPDATE CUENTA
-            SET saldo_cuenta = saldo_cuenta - p_monto_consumo,
-                updated_at = SYSTIMESTAMP
-            WHERE id_cuenta = v_id_cuenta
-            RETURNING saldo_cuenta INTO v_saldo_cuenta;
-            
-            -- Validar que no quede saldo negativo
-            IF v_saldo_cuenta < 0 THEN
-                ROLLBACK;
-                RAISE_APPLICATION_ERROR(-20021, 'Saldo insuficiente en la cuenta');
-            END IF;
-            
-            -- Actualizar la tarjeta con el nuevo saldo
-            UPDATE TARJETA
-            SET saldo_tarjeta = v_saldo_cuenta,
-                monto_limite = v_saldo_cuenta,
-                updated_at = SYSTIMESTAMP
-            WHERE id_tarjeta = p_id_tarjeta;
-            
-            COMMIT;
-            
-            DBMS_OUTPUT.PUT_LINE('Cuenta y tarjeta actualizadas. Nuevo saldo: ' || v_saldo_cuenta);
-        EXCEPTION
-            WHEN OTHERS THEN
-                ROLLBACK;
-                RAISE_APPLICATION_ERROR(-20023, 'Error actualizando cuenta: ' || SQLERRM);
-        END;
-    ELSE
-        -- Para tarjetas de crédito o sin cuenta asociada, simplemente salir sin error
-        DBMS_OUTPUT.PUT_LINE('Operación no requerida para este tipo de tarjeta');
-        RETURN;
-    END IF;
-END p_actualizar_cuenta_por_tarjeta;
-/
-
 
 BEGIN
     FOR rec IN (SELECT table_name

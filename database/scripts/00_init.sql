@@ -1,4 +1,4 @@
--- SYSTEM
+-- USUARIO sys as sysdba
 ALTER SESSION SET "_ORACLE_SCRIPT"=TRUE;
 
 -- Usuario 1: ALVARO
