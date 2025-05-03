@@ -1035,14 +1035,6 @@ BEGIN
 END;
 /
 
-BEGIN
-    sp_register_new_type_client(
-        p_nombre => 'Cuenta del banco',
-        p_descripcion => 'Este tipo de cliente corresponde a una cuenta del banco'
-    );
-END;
-/
-
 
 
 /*
