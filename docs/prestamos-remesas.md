@@ -1,1 +1,0 @@
-# Documentacion de Prestamos, remesas y todo lo relacionado

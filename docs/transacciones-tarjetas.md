@@ -1,1 +1,0 @@
-# Documentacion de transacciones tarjetas y todo lo relacionado

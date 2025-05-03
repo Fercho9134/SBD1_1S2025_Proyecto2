@@ -1,0 +1,13 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<OSDM_Design class="oracle.dbtools.crest.model.design.Design" name="SBD1_Proyecto2_DataModeler" id="38800F1F-B2B3-EC11-CC91-7F0AFE247B3A" version="3.5">
+<createdBy>angel</createdBy>
+<createdTime>2025-05-01 17:07:56 UTC</createdTime>
+<ownerDesignName>SBD1_Proyecto2_DataModeler</ownerDesignName>
+<capitalNames>false</capitalNames>
+<designId>38800F1F-B2B3-EC11-CC91-7F0AFE247B3A</designId>
+<usedDesignStorageDescriptors>
+<designDescr class="oracle.dbtools.crest.model.design.Design$DesignStorageDesc" id="9CE5A1E8-AA0C-B9FD-5E76-A8E046CCCD2C">
+<designStoragePath>C:\script completo</designStoragePath>
+</designDescr>
+</usedDesignStorageDescriptors>
+</OSDM_Design>
