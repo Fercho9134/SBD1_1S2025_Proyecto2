@@ -7,7 +7,7 @@ BEGIN sp_register_new_client(
     p_email => 'fercho.asensio@gmail.com',
     p_usuario => 'fernando',
     p_contrasena => '1234',
-    p_fecha_nacimiento => '25/03/2004',
+    p_fecha_nacimiento => TO_DATE('25/03/2004', 'DD/MM/YYYY'),
     p_tipo_cliente => 1
     );
 END;
@@ -19,7 +19,7 @@ BEGIN sp_register_new_client(
     p_email => 'fercho.asensio2@gmail.com',
     p_usuario => 'fernando2',
     p_contrasena => '1234',
-    p_fecha_nacimiento => '25/03/2004',
+    p_fecha_nacimiento => TO_DATE('25/03/2004', 'DD/MM/YYYY'),
     p_tipo_cliente => 1
     );
 END;

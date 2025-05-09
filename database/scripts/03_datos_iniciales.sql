@@ -890,7 +890,7 @@ BEGIN
     -- Obviar codigo de pais en numero telefonico
     v_telefono_limpio := REGEXP_REPLACE(
         p_numero_telefono,
-        '^\+\d{1,5}(?=\s|$)', ''
+        '^\+\d{1,3}\s?', ''
     );
     
     v_telefono_limpio := TRIM(v_telefono_limpio);
@@ -2015,8 +2015,8 @@ BEGIN
     END IF;
 
     -- Validar monto_limite positivo
-    IF p_monto_limite is not null and p_monto_limite <= 0 THEN
-        RAISE_APPLICATION_ERROR(-20034, 'Error: El monto límite debe ser positivo');
+    IF p_monto_limite is not null and p_monto_limite < 0 THEN
+        RAISE_APPLICATION_ERROR(-20034, 'Error: El monto límite debe ser igual o mayor a 0');
     END IF;
 
     -- Validar saldo_tarjeta no negativo
